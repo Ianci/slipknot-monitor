@@ -1,0 +1,32 @@
+# Guardalo en tu repo como: .github/workflows/monitor.yml
+name: Monitor entradas
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # cada 5 min (GitHub a veces lo atrasa unos minutos)
+  workflow_dispatch:         # para correrlo a mano desde la pestaña Actions
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Chequear entradas
+        env:
+          TICKET_URL: ${{ secrets.TICKET_URL }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SECTOR: ${{ vars.SECTOR || 'Campo Delantero' }}
+        run: python monitor.py
