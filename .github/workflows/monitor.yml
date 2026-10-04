@@ -9,7 +9,7 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@v4
 
@@ -19,9 +19,7 @@ jobs:
           cache: pip
 
       - name: Instalar dependencias
-        run: |
-          pip install -r requirements.txt
-          python -m playwright install --with-deps chromium
+        run: pip install -r requirements.txt
 
       - name: Chequear entradas
         env:
@@ -29,4 +27,5 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           SECTOR: ${{ vars.SECTOR || 'Campo Delantero' }}
+          RATE: ${{ vars.RATE }}
         run: python monitor.py
